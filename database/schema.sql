@@ -12,19 +12,18 @@ CREATE TABLE ordenes (
 ) ENGINE=InnoDB;
 
 CREATE TABLE productos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    sku VARCHAR(50) PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    sku VARCHAR(50),
     descripcion TEXT
 ) ENGINE=InnoDB;
 
 CREATE TABLE ordenes_productos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     orden_id INT,
-    producto_id INT,
+    producto_sku VARCHAR(50),
     cantidad INT,
     FOREIGN KEY (orden_id) REFERENCES ordenes(id),
-    FOREIGN KEY (producto_id) REFERENCES productos(id)
+    FOREIGN KEY (producto_sku) REFERENCES productos(sku)
 ) ENGINE=InnoDB;
 
 CREATE TABLE palets (
@@ -41,11 +40,11 @@ CREATE TABLE palet_lineas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     palet_id INT,
     orden_id INT,
-    producto_id INT,
+    producto_sku VARCHAR(50),
     cantidad INT,
     FOREIGN KEY (palet_id) REFERENCES palets(id),
     FOREIGN KEY (orden_id) REFERENCES ordenes(id),
-    FOREIGN KEY (producto_id) REFERENCES productos(id)
+    FOREIGN KEY (producto_sku) REFERENCES productos(sku)
 ) ENGINE=InnoDB;
 
 CREATE TABLE asns (
