@@ -8,7 +8,10 @@ CREATE TABLE ordenes (
     tipo_codigo_vendedor VARCHAR(20),
     fecha_orden DATE,
     estado VARCHAR(50),
-    observaciones TEXT
+    observaciones TEXT,
+    window_start DATE,
+    window_end DATE,
+    numero_palets INT
 ) ENGINE=InnoDB;
 
 CREATE TABLE productos (
