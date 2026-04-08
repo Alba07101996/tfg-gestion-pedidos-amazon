@@ -17,13 +17,22 @@ CREATE TABLE productos (
     descripcion TEXT
 ) ENGINE=InnoDB;
 
+CREATE TABLE formatos_producto (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    producto_sku VARCHAR(50) NOT NULL,
+    formato VARCHAR(50) NOT NULL,
+    unidades_por_caja INT,
+    unidades_por_palet INT,
+    FOREIGN KEY (producto_sku) REFERENCES productos(sku)
+) ENGINE=InnoDB;
+
 CREATE TABLE ordenes_productos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     orden_id INT,
-    producto_sku VARCHAR(50),
+    formato_id INT,
     cantidad INT,
     FOREIGN KEY (orden_id) REFERENCES ordenes(id),
-    FOREIGN KEY (producto_sku) REFERENCES productos(sku)
+    FOREIGN KEY (formato_id) REFERENCES formatos_producto(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE palets (
@@ -40,11 +49,11 @@ CREATE TABLE palet_lineas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     palet_id INT,
     orden_id INT,
-    producto_sku VARCHAR(50),
+    formato_id INT,
     cantidad INT,
     FOREIGN KEY (palet_id) REFERENCES palets(id),
     FOREIGN KEY (orden_id) REFERENCES ordenes(id),
-    FOREIGN KEY (producto_sku) REFERENCES productos(sku)
+    FOREIGN KEY (formato_id) REFERENCES formatos_producto(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE asns (
