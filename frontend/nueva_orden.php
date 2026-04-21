@@ -9,7 +9,6 @@ $mensaje = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $numero_orden = $_POST["numero_orden"];
-    $pais_origen = $_POST["pais_origen"];
     $grupo_destino = $_POST["grupo_destino"];
     $destino = $_POST["destino"];
     $codigo_vendedor = $_POST["codigo_vendedor"];
@@ -22,9 +21,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $numero_palets = $_POST["numero_palets"];
 
     $sql = "INSERT INTO ordenes 
-        (numero_orden, pais_origen, grupo_destino, destino, codigo_vendedor, tipo_codigo_vendedor, fecha_orden, estado, observaciones, window_start, window_end, numero_palets)
-        VALUES 
-        ('$numero_orden', '$pais_origen', '$grupo_destino', '$destino', '$codigo_vendedor', '$tipo_codigo_vendedor', '$fecha_orden', '$estado', '$observaciones', '$window_start', '$window_end', '$numero_palets')";
+    (numero_orden, grupo_destino, destino, codigo_vendedor, tipo_codigo_vendedor, fecha_orden, estado, observaciones, window_start, window_end, numero_palets)
+    VALUES 
+    ('$numero_orden', '$grupo_destino', '$destino', '$codigo_vendedor', '$tipo_codigo_vendedor', '$fecha_orden', '$estado', '$observaciones', '$window_start', '$window_end', '$numero_palets')";
 
     if ($conexion->query($sql) === TRUE) {
         $mensaje = "Orden guardada correctamente";
@@ -38,10 +37,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nueva orden</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
 
 <div class="app">
@@ -61,22 +60,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <main class="contenido">
         <header class="cabecera">
             <h1>Nueva orden</h1>
-            <p>Registrar una nueva orden en el sistema</p>
+            <p>Registrar una nueva orden</p>
         </header>
 
         <?php if ($mensaje != ""): ?>
             <div class="mensaje"><?php echo $mensaje; ?></div>
         <?php endif; ?>
 
-        <form class="formulario" method="POST" action="">
-            <div class="campo">
-                <label>Número de orden (PO)</label>
-                <input type="text" name="numero_orden" required>
-            </div>
+        <form class="formulario" method="POST">
 
             <div class="campo">
-                <label>País de origen</label>
-                <input type="text" name="pais_origen">
+                <label>PO</label>
+                <input type="text" name="numero_orden" required>
             </div>
 
             <div class="campo">
@@ -90,12 +85,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="campo">
-                <label>Código vendedor</label>
+                <label>Vendor code</label>
                 <input type="text" name="codigo_vendedor" required>
             </div>
 
             <div class="campo">
-                <label>Tipo código vendedor</label>
+                <label>Tipo</label>
                 <select name="tipo_codigo_vendedor">
                     <option value="ordering">ordering</option>
                     <option value="normal">normal</option>
@@ -123,7 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="campo">
-                <label>Número de palets</label>
+                <label>Nº palets</label>
                 <input type="number" name="numero_palets">
             </div>
 
@@ -133,8 +128,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="campo-completo">
-                <button type="submit" class="boton-guardar">Guardar orden</button>
+                <button class="boton-guardar">Guardar orden</button>
             </div>
+
         </form>
     </main>
 </div>

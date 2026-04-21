@@ -82,3 +82,4 @@ LEFT JOIN factura_ordenes fo ON o.id = fo.orden_id
 LEFT JOIN facturas fac ON fo.factura_id = fac.id
 
 WHERE o.numero_orden = '49KSJ9PC';
+

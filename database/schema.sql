@@ -1,7 +1,6 @@
 CREATE TABLE ordenes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     numero_orden VARCHAR(50) NOT NULL,
-    pais_origen VARCHAR(50),
     grupo_destino VARCHAR(50),
     destino VARCHAR(50),
     codigo_vendedor VARCHAR(50),
