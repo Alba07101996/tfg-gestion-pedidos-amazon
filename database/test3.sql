@@ -83,3 +83,10 @@ LEFT JOIN facturas fac ON fo.factura_id = fac.id
 
 WHERE o.numero_orden = '49KSJ9PC';
 
+
+ALTER TABLE palets
+ADD UNIQUE (codigo_palet);
+
+ALTER TABLE factura_ordenes
+ADD UNIQUE (orden_id);
+

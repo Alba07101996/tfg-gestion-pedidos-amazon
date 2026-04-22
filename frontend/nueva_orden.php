@@ -50,10 +50,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <a href="index.html">Inicio</a>
             <a href="ordenes.php">Órdenes</a>
             <a href="nueva_orden.php" class="activo">Nueva orden</a>
-            <a href="buscar.html">Buscar orden</a>
-            <a href="asn.html">ASN</a>
-            <a href="facturas.html">Facturas</a>
-            <a href="envios.html">Envíos</a>
+            <a href="buscar.php">Buscar orden</a>
+            <a href="asn.php">ASN</a>
+            <a href="facturas.php">Facturas</a>
+            <a href="envios.php">Envíos</a>
         </nav>
     </aside>
 

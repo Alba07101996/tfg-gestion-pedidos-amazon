@@ -118,13 +118,19 @@
 
 
 
-\### Facturas
+### Facturas
 
+- Una factura puede incluir varias órdenes.
+- Todas las órdenes de una factura deben tener el mismo destino.
+- Las órdenes pueden tener distinto código de vendedor.
+- Una orden solo puede estar asociada a una única factura.
 
+- El número de factura se genera automáticamente en función del país o destino:
+  - España → AMZ
+  - Francia → AMZF
+  - Italia → AMZI
+  - Alemania → AMZA
+  - Reino Unido → AMZU
 
-\- Una factura puede incluir varias órdenes.
-
-\- Las órdenes deben tener el mismo destino.
-
-\- Pueden tener distinto código de vendedor.
-
+- El formato del número de factura puede incluir el identificador de las órdenes asociadas.
+- Ejemplo: AMZ-001-49KSJ9PC-49KSJ9PD

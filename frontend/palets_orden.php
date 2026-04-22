@@ -12,7 +12,7 @@ if (!isset($_GET["id"])) {
 $orden_id = intval($_GET["id"]);
 $mensaje = "";
 
-// Obtener datos de la orden
+// Obtener orden
 $sqlOrden = "SELECT * FROM ordenes WHERE id = $orden_id";
 $resultadoOrden = $conexion->query($sqlOrden);
 
@@ -22,61 +22,63 @@ if ($resultadoOrden->num_rows == 0) {
 
 $orden = $resultadoOrden->fetch_assoc();
 
-// Crear nuevo palet
+// CREAR PALET
 if (isset($_POST["crear_palet"])) {
     $codigo_palet = trim($_POST["codigo_palet"]);
     $tipo_palet = trim($_POST["tipo_palet"]);
-    $destino = $orden["destino"];
-    $grupo_destino = $orden["grupo_destino"];
-    $estado = "pendiente";
-    $observaciones = trim($_POST["observaciones_palet"]);
 
-    $sqlInsertPalet = "INSERT INTO palets (codigo_palet, tipo_palet, destino, grupo_destino, estado, observaciones)
-                       VALUES ('$codigo_palet', '$tipo_palet', '$destino', '$grupo_destino', '$estado', '$observaciones')";
+    $sql = "INSERT INTO palets (codigo_palet, tipo_palet, destino, grupo_destino, estado)
+            VALUES ('$codigo_palet', '$tipo_palet', '{$orden['destino']}', '{$orden['grupo_destino']}', 'pendiente')";
 
-    if ($conexion->query($sqlInsertPalet) === TRUE) {
-        $mensaje = "Palet creado correctamente.";
+    if ($conexion->query($sql)) {
+        $mensaje = "Palet creado correctamente";
     } else {
-        die("Error SQL al crear palet: " . $conexion->error);
+        if ($conexion->errno == 1062) {
+            $mensaje = "⚠️ Ese código de palet ya existe";
+        } else {
+            die("Error SQL: " . $conexion->error);
+        }
     }
 }
 
-// Añadir línea a palet
+// AÑADIR LÍNEA
 if (isset($_POST["anadir_linea"])) {
     $palet_id = intval($_POST["palet_id"]);
     $formato_id = intval($_POST["formato_id"]);
     $cantidad = intval($_POST["cantidad"]);
 
-    $sqlInsertLinea = "INSERT INTO palet_lineas (palet_id, orden_id, formato_id, cantidad)
-                       VALUES ($palet_id, $orden_id, $formato_id, $cantidad)";
+    $sql = "INSERT INTO palet_lineas (palet_id, orden_id, formato_id, cantidad)
+            VALUES ($palet_id, $orden_id, $formato_id, $cantidad)";
 
-    if ($conexion->query($sqlInsertLinea) === TRUE) {
-        $mensaje = "Línea añadida al palet correctamente.";
+    if ($conexion->query($sql)) {
+        $mensaje = "Línea añadida correctamente";
     } else {
-        die("Error SQL al añadir línea: " . $conexion->error);
+        die("Error SQL: " . $conexion->error);
     }
 }
 
-// Obtener formatos disponibles
-$sqlFormatos = "
-    SELECT 
-        f.id,
-        p.sku,
-        p.nombre,
-        f.formato
+// FORMATOS
+$formatos = $conexion->query("
+    SELECT f.id, p.sku, p.nombre, f.formato
     FROM formatos_producto f
     JOIN productos p ON f.producto_sku = p.sku
-    ORDER BY p.sku, f.formato
-";
-$resultadoFormatos = $conexion->query($sqlFormatos);
+");
+
+// PALETS (SIN DUPLICADOS)
+$palets = $conexion->query("
+    SELECT MIN(id) as id, codigo_palet, tipo_palet
+    FROM palets
+    WHERE destino = '{$orden['destino']}'
+    GROUP BY codigo_palet, tipo_palet
+    ORDER BY id DESC
+");
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionar palets</title>
+    <title>Palets</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -87,157 +89,55 @@ $resultadoFormatos = $conexion->query($sqlFormatos);
         <nav>
             <a href="index.html">Inicio</a>
             <a href="ordenes.php" class="activo">Órdenes</a>
-            <a href="nueva_orden.php">Nueva orden</a>
-            <a href="buscar.html">Buscar orden</a>
-            <a href="asn.html">ASN</a>
-            <a href="facturas.html">Facturas</a>
-            <a href="envios.html">Envíos</a>
         </nav>
     </aside>
 
     <main class="contenido">
-        <header class="cabecera">
-            <h1>Gestionar palets de la orden</h1>
-            <p>
-                PO: <strong><?php echo $orden["numero_orden"]; ?></strong> |
-                Destino: <strong><?php echo $orden["destino"]; ?></strong> |
-                Vendor: <strong><?php echo $orden["codigo_vendedor"]; ?></strong>
-            </p>
-        </header>
 
-        <?php if ($mensaje != ""): ?>
-            <div class="mensaje"><?php echo $mensaje; ?></div>
-        <?php endif; ?>
+        <h1>Palets de la orden</h1>
+        <p><strong><?php echo $orden["numero_orden"]; ?></strong></p>
 
-        <section class="panel-seccion">
-            <h2>Crear nuevo palet</h2>
+        <?php if ($mensaje != "") echo "<p>$mensaje</p>"; ?>
 
-            <form class="formulario" method="POST">
-                <input type="hidden" name="crear_palet" value="1">
+        <!-- CREAR PALET -->
+        <h2>Nuevo palet</h2>
+        <form method="POST">
+            <input type="hidden" name="crear_palet">
+            <input type="text" name="codigo_palet" placeholder="Código palet" required>
+            <select name="tipo_palet">
+                <option value="normal">normal</option>
+                <option value="ordering">ordering</option>
+            </select>
+            <button>Crear</button>
+        </form>
 
-                <div class="campo">
-                    <label>Código palet</label>
-                    <input type="text" name="codigo_palet" required>
-                </div>
+        <!-- AÑADIR PRODUCTO -->
+        <h2>Añadir producto a palet</h2>
+        <form method="POST">
+            <input type="hidden" name="anadir_linea">
 
-                <div class="campo">
-                    <label>Tipo palet</label>
-                    <select name="tipo_palet">
-                        <option value="ordering">ordering</option>
-                        <option value="normal">normal</option>
-                    </select>
-                </div>
+            <select name="palet_id" required>
+                <option>Selecciona palet</option>
+                <?php while($p = $palets->fetch_assoc()) { ?>
+                    <option value="<?php echo $p["id"]; ?>">
+                        <?php echo $p["codigo_palet"] . " (" . $p["tipo_palet"] . ")"; ?>
+                    </option>
+                <?php } ?>
+            </select>
 
-                <div class="campo campo-completo">
-                    <label>Observaciones</label>
-                    <textarea name="observaciones_palet"></textarea>
-                </div>
+            <select name="formato_id" required>
+                <option>Producto</option>
+                <?php while($f = $formatos->fetch_assoc()) { ?>
+                    <option value="<?php echo $f["id"]; ?>">
+                        <?php echo $f["sku"] . " - " . $f["formato"]; ?>
+                    </option>
+                <?php } ?>
+            </select>
 
-                <div class="campo-completo">
-                    <button type="submit" class="boton-guardar">Crear palet</button>
-                </div>
-            </form>
-        </section>
+            <input type="number" name="cantidad" placeholder="Cantidad" required>
+            <button>Añadir</button>
+        </form>
 
-        <section class="panel-seccion">
-            <h2>Añadir contenido a un palet</h2>
-
-            <form class="formulario" method="POST">
-                <input type="hidden" name="anadir_linea" value="1">
-
-                <div class="campo">
-                    <label>Palet</label>
-                    <select name="palet_id" required>
-                        <option value="">Selecciona un palet</option>
-                        <?php
-                        $resultadoPaletsSelect = $conexion->query("SELECT * FROM palets WHERE destino = '{$orden['destino']}' ORDER BY id DESC");
-                        while ($palet = $resultadoPaletsSelect->fetch_assoc()) {
-                            echo "<option value='{$palet['id']}'>{$palet['codigo_palet']} ({$palet['tipo_palet']})</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-
-                <div class="campo">
-                    <label>Producto / formato</label>
-                    <select name="formato_id" required>
-                        <option value="">Selecciona un formato</option>
-                        <?php while ($formato = $resultadoFormatos->fetch_assoc()) { ?>
-                            <option value="<?php echo $formato["id"]; ?>">
-                                <?php echo $formato["sku"] . " - " . $formato["nombre"] . " - " . $formato["formato"]; ?>
-                            </option>
-                        <?php } ?>
-                    </select>
-                </div>
-
-                <div class="campo">
-                    <label>Cantidad</label>
-                    <input type="number" name="cantidad" required>
-                </div>
-
-                <div class="campo-completo">
-                    <button type="submit" class="boton-guardar">Añadir línea al palet</button>
-                </div>
-            </form>
-        </section>
-
-        <section class="panel-seccion">
-            <h2>Palets de la orden</h2>
-
-            <div class="cards">
-                <?php
-                $resultadoPaletsVista = $conexion->query("SELECT * FROM palets WHERE destino = '{$orden['destino']}' ORDER BY id DESC");
-
-                if ($resultadoPaletsVista->num_rows > 0) {
-                    while ($palet = $resultadoPaletsVista->fetch_assoc()) {
-                        echo "<div class='card'>";
-                        echo "<h3>{$palet['codigo_palet']}</h3>";
-                        echo "<p><strong>Tipo:</strong> {$palet['tipo_palet']}</p>";
-                        echo "<p><strong>Destino:</strong> {$palet['destino']}</p>";
-                        echo "<p><strong>Estado:</strong> {$palet['estado']}</p>";
-
-                        echo "<div class='lineas-box'>";
-                        echo "<h4>Contenido del palet</h4>";
-
-                        $palet_id = $palet["id"];
-
-                        $sqlContenido = "
-                            SELECT 
-                                p.sku,
-                                p.nombre AS producto,
-                                f.formato,
-                                pl.cantidad
-                            FROM palet_lineas pl
-                            JOIN formatos_producto f ON pl.formato_id = f.id
-                            JOIN productos p ON f.producto_sku = p.sku
-                            WHERE pl.palet_id = $palet_id
-                              AND pl.orden_id = $orden_id
-                        ";
-
-                        $resultadoContenido = $conexion->query($sqlContenido);
-
-                        if ($resultadoContenido->num_rows > 0) {
-                            while ($linea = $resultadoContenido->fetch_assoc()) {
-                                echo "<div class='linea-item'>";
-                                echo "<p><strong>SKU:</strong> {$linea['sku']}</p>";
-                                echo "<p><strong>Producto:</strong> {$linea['producto']}</p>";
-                                echo "<p><strong>Formato:</strong> {$linea['formato']}</p>";
-                                echo "<p><strong>Cantidad:</strong> {$linea['cantidad']}</p>";
-                                echo "</div>";
-                            }
-                        } else {
-                            echo "<p class='sin-lineas'>Este palet todavía no tiene líneas para esta orden.</p>";
-                        }
-
-                        echo "</div>";
-                        echo "</div>";
-                    }
-                } else {
-                    echo "<p class='sin-lineas'>Todavía no hay palets creados.</p>";
-                }
-                ?>
-            </div>
-        </section>
     </main>
 </div>
 

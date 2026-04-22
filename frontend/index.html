@@ -2,8 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión logística Amazon</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="css/styles.css">
+
+    <!-- ICONOS -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
@@ -12,7 +18,7 @@
     <aside class="sidebar">
         <h2>Logística Amazon</h2>
         <nav>
-            <a href="index.html" class="activo">Inicio</a>
+            <a href="index.php" class="activo">Inicio</a>
             <a href="ordenes.php">Órdenes</a>
             <a href="nueva_orden.php">Nueva orden</a>
             <a href="buscar.php">Buscar orden</a>
@@ -23,35 +29,52 @@
     </aside>
 
     <main class="contenido">
-        <h1>Panel principal</h1>
+
+        <header class="cabecera">
+            <h1>Panel principal</h1>
+            <p>Gestión de órdenes, ASN, facturas y transporte</p>
+        </header>
 
         <section class="tarjetas">
 
             <a href="ordenes.php" class="tarjeta">
+                <i class="fas fa-boxes icono"></i>
                 <h3>Órdenes</h3>
+                <p>Visualizar todas las órdenes registradas</p>
             </a>
 
             <a href="nueva_orden.php" class="tarjeta">
+                <i class="fas fa-plus-circle icono"></i>
                 <h3>Nueva orden</h3>
+                <p>Crear una nueva orden en el sistema</p>
             </a>
 
             <a href="buscar.php" class="tarjeta">
+                <i class="fas fa-search icono"></i>
                 <h3>Buscar</h3>
+                <p>Buscar por PO, destino, vendor, factura o tracking</p>
             </a>
 
             <a href="asn.php" class="tarjeta">
+                <i class="fas fa-truck icono"></i>
                 <h3>ASN</h3>
+                <p>Consultar avisos avanzados de expedición</p>
             </a>
 
             <a href="facturas.php" class="tarjeta">
+                <i class="fas fa-file-invoice icono"></i>
                 <h3>Facturas</h3>
+                <p>Consultar y relacionar facturas con órdenes</p>
             </a>
 
             <a href="envios.php" class="tarjeta">
+                <i class="fas fa-shipping-fast icono"></i>
                 <h3>Envíos</h3>
+                <p>Seguimiento y agencias de transporte</p>
             </a>
 
         </section>
+
     </main>
 
 </div>
