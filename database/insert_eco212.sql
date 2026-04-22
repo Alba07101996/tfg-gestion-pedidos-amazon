@@ -20,3 +20,10 @@ INSERT INTO formatos_producto (producto_sku, formato, unidades_por_caja, unidade
 VALUES
 ('ECO-112', '5L', 2, 86);
 
+INSERT INTO productos (sku, nombre, descripcion)
+VALUES ('ECO-103', 'INSECTOS', 'LIMPIADOR DE INSECTOS');
+
+INSERT INTO formatos_producto (producto_sku, formato, unidades_por_caja, unidades_por_palet)
+VALUES
+('ECO-103', '750ML', 7, 504),
+('ECO-103', '5L', 2, 86);

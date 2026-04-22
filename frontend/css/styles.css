@@ -1,22 +1,24 @@
+/* RESET BÁSICO */
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
+/* BODY */
 body {
     background: #f4f6f8;
     color: #1f2937;
 }
 
-/* Layout */
+/* LAYOUT GENERAL */
 .app {
     display: flex;
     min-height: 100vh;
 }
 
-/* Sidebar */
+/* SIDEBAR */
 .sidebar {
     width: 250px;
     background: #0f172a;
@@ -48,13 +50,13 @@ body {
     background: #2563eb;
 }
 
-/* Contenido */
+/* CONTENIDO */
 .contenido {
     flex: 1;
     padding: 40px;
 }
 
-/* Cabecera */
+/* CABECERA */
 .cabecera {
     margin-bottom: 30px;
 }
@@ -68,22 +70,23 @@ body {
     color: #6b7280;
 }
 
-/* Tarjetas (index) */
+/* TARJETAS PANEL */
 .tarjetas {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
 }
 
 .tarjeta {
     display: block;
     background: white;
-    padding: 25px;
-    border-radius: 16px;
+    padding: 28px;
+    border-radius: 18px;
     text-decoration: none;
     color: #111827;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: 0.2s;
+    min-height: 150px;
 }
 
 .tarjeta:hover {
@@ -92,51 +95,40 @@ body {
 }
 
 .tarjeta h3 {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    font-size: 20px;
 }
 
 .tarjeta p {
     color: #6b7280;
+    font-size: 14px;
+    line-height: 1.5;
 }
 
-/* Cards (ordenes) */
-.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.card {
+/* SECCIONES */
+.panel-seccion {
+    margin-bottom: 35px;
     background: white;
-    padding: 20px;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: 0.2s;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+.panel-seccion h2 {
+    margin-bottom: 20px;
 }
 
-.card h3 {
-    margin-bottom: 10px;
-}
-
-.card p {
-    margin: 5px 0;
-    color: #555;
-}
-
-/* Formulario */
+/* FORMULARIOS */
 .formulario {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
-    background: white;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.formulario-busqueda {
+    display: flex;
+    gap: 15px;
+    align-items: center;
 }
 
 .campo {
@@ -144,154 +136,136 @@ body {
     flex-direction: column;
 }
 
-.campo label {
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #374151;
-}
-
-.campo input,
-.campo select,
-.campo textarea {
-    padding: 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 10px;
-    font-size: 14px;
-}
-
-.campo textarea {
-    min-height: 120px;
-    resize: vertical;
-}
-
 .campo-completo {
     grid-column: 1 / -1;
 }
 
-/* Botón */
+.campo label {
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input,
+select,
+textarea {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+
+/* BOTONES */
+button,
 .boton-guardar {
     background: #2563eb;
     color: white;
     border: none;
-    padding: 14px;
+    padding: 12px 20px;
     border-radius: 10px;
     cursor: pointer;
-    font-weight: bold;
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
+button:hover,
 .boton-guardar:hover {
     background: #1d4ed8;
 }
 
-/* Mensaje éxito */
-.mensaje {
-    background: #dcfce7;
-    color: #166534;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    font-weight: bold;
-}
-.lineas-box {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #e5e7eb;
+/* TARJETAS DE DATOS (ordenes, palets, etc) */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
 }
 
-.lineas-box h4 {
-    margin-bottom: 12px;
-    font-size: 16px;
-    color: #1f2937;
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
-.linea-item {
-    background: #f8fafc;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 12px;
+.card h3 {
     margin-bottom: 10px;
 }
 
-.linea-item p {
-    margin: 4px 0;
-    color: #374151;
+.card p {
+    margin-bottom: 6px;
+    font-size: 14px;
 }
 
-.sin-lineas {
-    color: #6b7280;
-    font-style: italic;
-}
-.lineas-box {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #e5e7eb;
-}
-
-.lineas-box h4 {
-    margin-bottom: 12px;
-    font-size: 16px;
-    color: #1f2937;
-}
-
-.linea-item {
-    background: #f8fafc;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 10px;
-}
-
-.linea-item p {
-    margin: 4px 0;
-    color: #374151;
-}
-
-.sin-lineas {
-    color: #6b7280;
-    font-style: italic;
-}
-
+/* ACCIONES EN TARJETAS */
 .acciones-card {
+    margin-top: 15px;
     display: flex;
-    gap: 10px;
-    margin-top: 18px;
     flex-wrap: wrap;
+    gap: 10px;
 }
 
 .boton-card {
+    padding: 8px 12px;
+    border-radius: 8px;
     text-decoration: none;
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-weight: bold;
-    font-size: 14px;
-    transition: 0.3s;
-    display: inline-block;
+    font-size: 13px;
+    color: white;
 }
 
 .boton-ver {
     background: #2563eb;
-    color: white;
-}
-
-.boton-ver:hover {
-    background: #1d4ed8;
 }
 
 .boton-editar {
-    background: #f59e0b;
-    color: white;
-}
-
-.boton-editar:hover {
-    background: #d97706;
+    background: #10b981;
 }
 
 .boton-eliminar {
-    background: #dc2626;
-    color: white;
+    background: #ef4444;
 }
 
-.boton-eliminar:hover {
-    background: #b91c1c;
+/* LINEAS PRODUCTO / PALET */
+.lineas-box {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e5e7eb;
 }
+
+.linea-item {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 10px;
+}
+
+.sin-lineas {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+/* GRID DETALLE */
+.detalle-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.detalle-item {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.detalle-item-completo {
+    grid-column: 1 / -1;
+}
+
+/* MENSAJES */
+.mensaje {
+    margin-bottom: 20px;
+    padding: 12px;
+    background: #dcfce7;
+    border: 1px solid #16a34a;
+    border-radius: 10px;
+    color: #166534;
+}
+

@@ -23,10 +23,10 @@ if ($conexion->connect_error) {
             <a href="index.html">Inicio</a>
             <a href="ordenes.php" class="activo">Órdenes</a>
             <a href="nueva_orden.php">Nueva orden</a>
-            <a href="buscar.html">Buscar orden</a>
-            <a href="asn.html">ASN</a>
-            <a href="facturas.html">Facturas</a>
-            <a href="envios.html">Envíos</a>
+            <a href="buscar.php">Buscar orden</a>
+            <a href="asn.php">ASN</a>
+            <a href="facturas.php">Facturas</a>
+            <a href="envios.php">Envíos</a>
         </nav>
     </aside>
 
@@ -62,7 +62,10 @@ if ($conexion->connect_error) {
                         p.sku,
                         p.nombre AS producto,
                         f.formato,
-                        op.cantidad
+                        op.cantidad,
+                        op.numero_palets,
+                        op.unidades_por_palet,
+                        op.tipo_paletizado
                     FROM ordenes_productos op
                     LEFT JOIN formatos_producto f ON op.formato_id = f.id
                     LEFT JOIN productos p ON f.producto_sku = p.sku
@@ -78,6 +81,9 @@ if ($conexion->connect_error) {
                         echo "<p><strong>Producto:</strong> " . $linea['producto'] . "</p>";
                         echo "<p><strong>Formato:</strong> " . $linea['formato'] . "</p>";
                         echo "<p><strong>Unidades:</strong> " . $linea['cantidad'] . "</p>";
+                        echo "<p><strong>Palets línea:</strong> " . $linea['numero_palets'] . "</p>";
+                        echo "<p><strong>Uds/palet:</strong> " . $linea['unidades_por_palet'] . "</p>";
+                        echo "<p><strong>Tipo paletizado:</strong> " . $linea['tipo_paletizado'] . "</p>";
                         echo "</div>";
                     }
                 } else {
@@ -86,17 +92,12 @@ if ($conexion->connect_error) {
 
                 echo "</div>";
 
-                // BOTONES
                 echo "<div class='acciones-card'>";
-                
                 echo "<a href='agregar_producto_orden.php?id=" . $orden['id'] . "' class='boton-card boton-ver'>Añadir productos</a>";
-
+                echo "<a href='palets_orden.php?id=" . $orden['id'] . "' class='boton-card boton-ver'>Gestionar palets</a>";
                 echo "<a href='detalle_orden.php?id=" . $orden['id'] . "' class='boton-card boton-ver'>Ver</a>";
-
                 echo "<a href='editar_orden.php?id=" . $orden['id'] . "' class='boton-card boton-editar'>Editar</a>";
-
                 echo "<a href='eliminar_orden.php?id=" . $orden['id'] . "' class='boton-card boton-eliminar' onclick='return confirm(\"¿Eliminar orden?\")'>Eliminar</a>";
-
                 echo "</div>";
 
                 echo "</div>";
@@ -109,3 +110,5 @@ if ($conexion->connect_error) {
 
 </body>
 </html>
+
+
