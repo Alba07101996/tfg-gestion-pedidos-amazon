@@ -61,12 +61,10 @@ CREATE TABLE palet_lineas (
 CREATE TABLE asns (
     id INT AUTO_INCREMENT PRIMARY KEY,
     numero_asn VARCHAR(50),
-    codigo_vendedor VARCHAR(50),
-    destino VARCHAR(50),
-    grupo_destino VARCHAR(50),
     fecha_asn DATE,
     estado VARCHAR(50),
     observaciones TEXT
+
 ) ENGINE=InnoDB;
 
 CREATE TABLE asn_ordenes (
