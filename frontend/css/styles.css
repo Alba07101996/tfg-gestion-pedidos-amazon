@@ -304,3 +304,12 @@ button:hover,
 .tarjeta:hover::after {
     transform: scaleX(1);
 }
+.card a {
+    color: #2563eb;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.card a:hover {
+    text-decoration: underline;
+}
