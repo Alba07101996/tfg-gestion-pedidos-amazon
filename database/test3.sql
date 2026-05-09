@@ -90,3 +90,7 @@ ADD UNIQUE (codigo_palet);
 ALTER TABLE factura_ordenes
 ADD UNIQUE (orden_id);
 
+ALTER TABLE asns
+DROP COLUMN codigo_vendedor,
+DROP COLUMN destino,
+DROP COLUMN grupo_destino;

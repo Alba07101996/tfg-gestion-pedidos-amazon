@@ -263,10 +263,10 @@ button:hover,
 .mensaje {
     margin-bottom: 20px;
     padding: 12px;
-    background: #dcfce7;
-    border: 1px solid #a39c16;
+    background: #639cf1;
+    border: 1px solid #05040e;
     border-radius: 10px;
-    color: #fff648;
+    color: #000000;
 }
 
 /* ICONOS */
