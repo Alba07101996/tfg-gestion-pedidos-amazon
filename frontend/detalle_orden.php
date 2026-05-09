@@ -25,7 +25,6 @@ $orden = $resultadoOrden->fetch_assoc();
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle de orden</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -35,7 +34,7 @@ $orden = $resultadoOrden->fetch_assoc();
     <aside class="sidebar">
         <h2>Logística Amazon</h2>
         <nav>
-            <a href="index.html">Inicio</a>
+            <a href="index.php">Inicio</a>
             <a href="ordenes.php" class="activo">Órdenes</a>
             <a href="nueva_orden.php">Nueva orden</a>
             <a href="buscar.php">Buscar orden</a>
@@ -53,6 +52,7 @@ $orden = $resultadoOrden->fetch_assoc();
 
         <section class="panel-seccion">
             <h2>Datos generales</h2>
+
             <div class="detalle-grid">
                 <div class="detalle-item"><strong>PO:</strong> <?php echo $orden["numero_orden"]; ?></div>
                 <div class="detalle-item"><strong>Grupo destino:</strong> <?php echo $orden["grupo_destino"]; ?></div>
@@ -70,6 +70,7 @@ $orden = $resultadoOrden->fetch_assoc();
 
         <section class="panel-seccion">
             <h2>Líneas de producto</h2>
+
             <div class="cards">
                 <?php
                 $sqlLineas = "
@@ -110,6 +111,7 @@ $orden = $resultadoOrden->fetch_assoc();
 
         <section class="panel-seccion">
             <h2>Palets de la orden</h2>
+
             <div class="cards">
                 <?php
                 $sqlPalets = "
@@ -175,10 +177,15 @@ $orden = $resultadoOrden->fetch_assoc();
 
         <section class="panel-seccion">
             <h2>ASN relacionados</h2>
+
             <div class="cards">
                 <?php
                 $sqlAsn = "
-                    SELECT a.numero_asn, a.codigo_vendedor, a.destino, a.fecha_asn, a.estado
+                    SELECT 
+                        a.numero_asn,
+                        a.fecha_asn,
+                        a.estado,
+                        a.observaciones
                     FROM asn_ordenes ao
                     JOIN asns a ON ao.asn_id = a.id
                     WHERE ao.orden_id = $orden_id
@@ -191,10 +198,9 @@ $orden = $resultadoOrden->fetch_assoc();
                     while ($asn = $resultadoAsn->fetch_assoc()) {
                         echo "<div class='card'>";
                         echo "<h3>ASN: {$asn['numero_asn']}</h3>";
-                        echo "<p><strong>Vendor:</strong> {$asn['codigo_vendedor']}</p>";
-                        echo "<p><strong>Destino:</strong> {$asn['destino']}</p>";
                         echo "<p><strong>Fecha ASN:</strong> {$asn['fecha_asn']}</p>";
                         echo "<p><strong>Estado:</strong> {$asn['estado']}</p>";
+                        echo "<p><strong>Observaciones:</strong> {$asn['observaciones']}</p>";
                         echo "</div>";
                     }
                 } else {
@@ -206,6 +212,7 @@ $orden = $resultadoOrden->fetch_assoc();
 
         <section class="panel-seccion">
             <h2>Facturas relacionadas</h2>
+
             <div class="cards">
                 <?php
                 $sqlFacturas = "
@@ -237,6 +244,7 @@ $orden = $resultadoOrden->fetch_assoc();
 
         <section class="panel-seccion">
             <h2>Envíos relacionados</h2>
+
             <div class="cards">
                 <?php
                 $sqlEnvios = "
