@@ -1,8 +1,16 @@
 <?php
-$conexion = new mysqli("localhost", "root", "", "tfg_pedidos_amazon");
+require_once 'auth.php';
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-if ($conexion->connect_error) {
-    die("Error de conexión: " . $conexion->connect_error);
+try {
+    $conexion = new mysqli("localhost", "root", "", "tfg_pedidos_amazon");
+    $conexion->set_charset("utf8mb4");
+} catch (mysqli_sql_exception $e) {
+    die("Error de conexión: " . $e->getMessage());
+}
+
+function h($str) {
+    return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8');
 }
 
 if (!isset($_GET["id"])) {
@@ -11,16 +19,17 @@ if (!isset($_GET["id"])) {
 
 $orden_id = intval($_GET["id"]);
 
-$sqlOrden = "SELECT * FROM ordenes WHERE id = $orden_id";
-$resultadoOrden = $conexion->query($sqlOrden);
+$stmt = $conexion->prepare("SELECT * FROM ordenes WHERE id = ?");
+$stmt->bind_param("i", $orden_id);
+$stmt->execute();
+$resultado = $stmt->get_result();
 
-if ($resultadoOrden->num_rows == 0) {
+if ($resultado->num_rows == 0) {
     die("La orden no existe.");
 }
 
-$orden = $resultadoOrden->fetch_assoc();
+$orden = $resultado->fetch_assoc();
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -50,30 +59,34 @@ $orden = $resultadoOrden->fetch_assoc();
             <p>Información completa de la orden seleccionada</p>
         </header>
 
+        <!-- ================================================ -->
+        <!-- DATOS GENERALES                                   -->
+        <!-- ================================================ -->
         <section class="panel-seccion">
             <h2>Datos generales</h2>
-
             <div class="detalle-grid">
-                <div class="detalle-item"><strong>PO:</strong> <?php echo $orden["numero_orden"]; ?></div>
-                <div class="detalle-item"><strong>Grupo destino:</strong> <?php echo $orden["grupo_destino"]; ?></div>
-                <div class="detalle-item"><strong>Destino:</strong> <?php echo $orden["destino"]; ?></div>
-                <div class="detalle-item"><strong>Vendor code:</strong> <?php echo $orden["codigo_vendedor"]; ?></div>
-                <div class="detalle-item"><strong>Tipo:</strong> <?php echo $orden["tipo_codigo_vendedor"]; ?></div>
-                <div class="detalle-item"><strong>Fecha orden:</strong> <?php echo $orden["fecha_orden"]; ?></div>
-                <div class="detalle-item"><strong>Estado:</strong> <?php echo $orden["estado"]; ?></div>
-                <div class="detalle-item"><strong>Window start:</strong> <?php echo $orden["window_start"]; ?></div>
-                <div class="detalle-item"><strong>Window end:</strong> <?php echo $orden["window_end"]; ?></div>
-                <div class="detalle-item"><strong>Nº palets:</strong> <?php echo $orden["numero_palets"]; ?></div>
-                <div class="detalle-item detalle-item-completo"><strong>Observaciones:</strong> <?php echo $orden["observaciones"]; ?></div>
+                <div class="detalle-item"><strong>PO:</strong> <?php echo h($orden["numero_orden"]); ?></div>
+                <div class="detalle-item"><strong>País:</strong> <?php echo h($orden["grupo_destino"]); ?></div>
+                <div class="detalle-item"><strong>Destino:</strong> <?php echo h($orden["destino"]); ?></div>
+                <div class="detalle-item"><strong>Vendor code:</strong> <?php echo h($orden["codigo_vendedor"]); ?></div>
+                <div class="detalle-item"><strong>Tipo:</strong> <?php echo h($orden["tipo_codigo_vendedor"]); ?></div>
+                <div class="detalle-item"><strong>Fecha orden:</strong> <?php echo h($orden["fecha_orden"]); ?></div>
+                <div class="detalle-item"><strong>Estado:</strong> <?php echo h($orden["estado"]); ?></div>
+                <div class="detalle-item"><strong>Window start:</strong> <?php echo h($orden["window_start"]); ?></div>
+                <div class="detalle-item"><strong>Window end:</strong> <?php echo h($orden["window_end"]); ?></div>
+                <div class="detalle-item"><strong>Nº palets:</strong> <?php echo h($orden["numero_palets"]); ?></div>
+                <div class="detalle-item detalle-item-completo"><strong>Observaciones:</strong> <?php echo h($orden["observaciones"]); ?></div>
             </div>
         </section>
 
+        <!-- ================================================ -->
+        <!-- LÍNEAS DE PRODUCTO                                -->
+        <!-- ================================================ -->
         <section class="panel-seccion">
             <h2>Líneas de producto</h2>
-
             <div class="cards">
                 <?php
-                $sqlLineas = "
+                $stmtL = $conexion->prepare("
                     SELECT 
                         p.sku,
                         p.nombre AS producto,
@@ -85,190 +98,220 @@ $orden = $resultadoOrden->fetch_assoc();
                     FROM ordenes_productos op
                     JOIN formatos_producto f ON op.formato_id = f.id
                     JOIN productos p ON f.producto_sku = p.sku
-                    WHERE op.orden_id = $orden_id
+                    WHERE op.orden_id = ?
                     ORDER BY op.id DESC
-                ";
+                ");
+                $stmtL->bind_param("i", $orden_id);
+                $stmtL->execute();
+                $resLineas = $stmtL->get_result();
 
-                $resultadoLineas = $conexion->query($sqlLineas);
-
-                if ($resultadoLineas->num_rows > 0) {
-                    while ($linea = $resultadoLineas->fetch_assoc()) {
-                        echo "<div class='card'>";
-                        echo "<h3>{$linea['sku']} - {$linea['formato']}</h3>";
-                        echo "<p><strong>Producto:</strong> {$linea['producto']}</p>";
-                        echo "<p><strong>Cantidad:</strong> {$linea['cantidad']}</p>";
-                        echo "<p><strong>Palets línea:</strong> {$linea['numero_palets']}</p>";
-                        echo "<p><strong>Uds/palet:</strong> {$linea['unidades_por_palet']}</p>";
-                        echo "<p><strong>Tipo paletizado:</strong> {$linea['tipo_paletizado']}</p>";
-                        echo "</div>";
-                    }
-                } else {
+                if ($resLineas->num_rows > 0):
+                    while ($linea = $resLineas->fetch_assoc()):
+                ?>
+                    <div class="card">
+                        <h3><?php echo h($linea['sku']); ?> — <?php echo h($linea['formato']); ?></h3>
+                        <p><strong>Producto:</strong> <?php echo h($linea['producto']); ?></p>
+                        <p><strong>Cantidad:</strong> <?php echo h($linea['cantidad']); ?></p>
+                        <p><strong>Palets línea:</strong> <?php echo h($linea['numero_palets']); ?></p>
+                        <p><strong>Uds/palet:</strong> <?php echo h($linea['unidades_por_palet']); ?></p>
+                        <p><strong>Tipo paletizado:</strong> <?php echo h($linea['tipo_paletizado']); ?></p>
+                    </div>
+                <?php
+                    endwhile;
+                else:
                     echo "<p class='sin-lineas'>La orden no tiene líneas de producto.</p>";
-                }
+                endif;
                 ?>
             </div>
         </section>
 
+        <!-- ================================================ -->
+        <!-- PALETS                                            -->
+        <!-- ================================================ -->
         <section class="panel-seccion">
             <h2>Palets de la orden</h2>
-
             <div class="cards">
                 <?php
-                $sqlPalets = "
+                $stmtP = $conexion->prepare("
                     SELECT DISTINCT p.id, p.codigo_palet, p.tipo_palet, p.destino, p.estado, p.observaciones
                     FROM palets p
                     JOIN palet_lineas pl ON p.id = pl.palet_id
-                    WHERE pl.orden_id = $orden_id
+                    WHERE pl.orden_id = ?
                     ORDER BY p.id DESC
-                ";
+                ");
+                $stmtP->bind_param("i", $orden_id);
+                $stmtP->execute();
+                $resPalets = $stmtP->get_result();
 
-                $resultadoPalets = $conexion->query($sqlPalets);
+                if ($resPalets->num_rows > 0):
+                    while ($palet = $resPalets->fetch_assoc()):
+                        $palet_id = intval($palet["id"]);
+                ?>
+                    <div class="card">
+                        <h3><?php echo h($palet['codigo_palet']); ?></h3>
+                        <p><strong>Tipo:</strong> <?php echo h($palet['tipo_palet']); ?></p>
+                        <p><strong>Destino:</strong> <?php echo h($palet['destino']); ?></p>
+                        <p><strong>Estado:</strong> <?php echo h($palet['estado']); ?></p>
 
-                if ($resultadoPalets->num_rows > 0) {
-                    while ($palet = $resultadoPalets->fetch_assoc()) {
-                        echo "<div class='card'>";
-                        echo "<h3>{$palet['codigo_palet']}</h3>";
-                        echo "<p><strong>Tipo:</strong> {$palet['tipo_palet']}</p>";
-                        echo "<p><strong>Destino:</strong> {$palet['destino']}</p>";
-                        echo "<p><strong>Estado:</strong> {$palet['estado']}</p>";
+                        <div class="lineas-box">
+                            <h4>Contenido del palet</h4>
+                            <?php
+                            $stmtC = $conexion->prepare("
+                                SELECT 
+                                    pr.sku,
+                                    pr.nombre AS producto,
+                                    f.formato,
+                                    pl.cantidad
+                                FROM palet_lineas pl
+                                JOIN formatos_producto f ON pl.formato_id = f.id
+                                JOIN productos pr ON f.producto_sku = pr.sku
+                                WHERE pl.palet_id = ? AND pl.orden_id = ?
+                            ");
+                            $stmtC->bind_param("ii", $palet_id, $orden_id);
+                            $stmtC->execute();
+                            $resContenido = $stmtC->get_result();
 
-                        echo "<div class='lineas-box'>";
-                        echo "<h4>Contenido del palet</h4>";
-
-                        $palet_id = $palet["id"];
-
-                        $sqlContenido = "
-                            SELECT 
-                                pr.sku,
-                                pr.nombre AS producto,
-                                f.formato,
-                                pl.cantidad
-                            FROM palet_lineas pl
-                            JOIN formatos_producto f ON pl.formato_id = f.id
-                            JOIN productos pr ON f.producto_sku = pr.sku
-                            WHERE pl.palet_id = $palet_id
-                              AND pl.orden_id = $orden_id
-                        ";
-
-                        $resultadoContenido = $conexion->query($sqlContenido);
-
-                        if ($resultadoContenido->num_rows > 0) {
-                            while ($contenido = $resultadoContenido->fetch_assoc()) {
-                                echo "<div class='linea-item'>";
-                                echo "<p><strong>SKU:</strong> {$contenido['sku']}</p>";
-                                echo "<p><strong>Producto:</strong> {$contenido['producto']}</p>";
-                                echo "<p><strong>Formato:</strong> {$contenido['formato']}</p>";
-                                echo "<p><strong>Cantidad:</strong> {$contenido['cantidad']}</p>";
-                                echo "</div>";
-                            }
-                        } else {
-                            echo "<p class='sin-lineas'>Sin contenido asociado.</p>";
-                        }
-
-                        echo "</div>";
-                        echo "</div>";
-                    }
-                } else {
+                            if ($resContenido->num_rows > 0):
+                                while ($contenido = $resContenido->fetch_assoc()):
+                            ?>
+                                <div class="linea-item">
+                                    <p><strong>SKU:</strong> <?php echo h($contenido['sku']); ?></p>
+                                    <p><strong>Producto:</strong> <?php echo h($contenido['producto']); ?></p>
+                                    <p><strong>Formato:</strong> <?php echo h($contenido['formato']); ?></p>
+                                    <p><strong>Cantidad:</strong> <?php echo h($contenido['cantidad']); ?></p>
+                                </div>
+                            <?php
+                                endwhile;
+                            else:
+                                echo "<p class='sin-lineas'>Sin contenido asociado.</p>";
+                            endif;
+                            ?>
+                        </div>
+                    </div>
+                <?php
+                    endwhile;
+                else:
                     echo "<p class='sin-lineas'>La orden no tiene palets asociados.</p>";
-                }
+                endif;
                 ?>
             </div>
         </section>
 
+        <!-- ================================================ -->
+        <!-- ASN                                               -->
+        <!-- ================================================ -->
         <section class="panel-seccion">
             <h2>ASN relacionados</h2>
-
             <div class="cards">
                 <?php
-                $sqlAsn = "
-                    SELECT 
-                        a.numero_asn,
-                        a.fecha_asn,
-                        a.estado,
-                        a.observaciones
+                $stmtA = $conexion->prepare("
+                    SELECT a.numero_asn, a.fecha_asn, a.estado, a.observaciones
                     FROM asn_ordenes ao
                     JOIN asns a ON ao.asn_id = a.id
-                    WHERE ao.orden_id = $orden_id
+                    WHERE ao.orden_id = ?
                     ORDER BY a.id DESC
-                ";
+                ");
+                $stmtA->bind_param("i", $orden_id);
+                $stmtA->execute();
+                $resAsn = $stmtA->get_result();
 
-                $resultadoAsn = $conexion->query($sqlAsn);
-
-                if ($resultadoAsn->num_rows > 0) {
-                    while ($asn = $resultadoAsn->fetch_assoc()) {
-                        echo "<div class='card'>";
-                        echo "<h3>ASN: {$asn['numero_asn']}</h3>";
-                        echo "<p><strong>Fecha ASN:</strong> {$asn['fecha_asn']}</p>";
-                        echo "<p><strong>Estado:</strong> {$asn['estado']}</p>";
-                        echo "<p><strong>Observaciones:</strong> {$asn['observaciones']}</p>";
-                        echo "</div>";
-                    }
-                } else {
+                if ($resAsn->num_rows > 0):
+                    while ($asn = $resAsn->fetch_assoc()):
+                ?>
+                    <div class="card">
+                        <h3>ASN: <?php echo h($asn['numero_asn']); ?></h3>
+                        <p><strong>Fecha ASN:</strong> <?php echo h($asn['fecha_asn']); ?></p>
+                        <p><strong>Estado:</strong> <?php echo h($asn['estado']); ?></p>
+                        <p><strong>Observaciones:</strong> <?php echo h($asn['observaciones']); ?></p>
+                    </div>
+                <?php
+                    endwhile;
+                else:
                     echo "<p class='sin-lineas'>La orden no tiene ASN asociados.</p>";
-                }
+                endif;
                 ?>
             </div>
         </section>
 
+        <!-- ================================================ -->
+        <!-- FACTURAS                                          -->
+        <!-- ================================================ -->
         <section class="panel-seccion">
             <h2>Facturas relacionadas</h2>
-
             <div class="cards">
                 <?php
-                $sqlFacturas = "
+                $stmtF = $conexion->prepare("
                     SELECT f.numero_factura, f.destino, f.fecha_factura, f.importe_total, f.observaciones
                     FROM factura_ordenes fo
                     JOIN facturas f ON fo.factura_id = f.id
-                    WHERE fo.orden_id = $orden_id
+                    WHERE fo.orden_id = ?
                     ORDER BY f.id DESC
-                ";
+                ");
+                $stmtF->bind_param("i", $orden_id);
+                $stmtF->execute();
+                $resFacturas = $stmtF->get_result();
 
-                $resultadoFacturas = $conexion->query($sqlFacturas);
-
-                if ($resultadoFacturas->num_rows > 0) {
-                    while ($factura = $resultadoFacturas->fetch_assoc()) {
-                        echo "<div class='card'>";
-                        echo "<h3>Factura: {$factura['numero_factura']}</h3>";
-                        echo "<p><strong>Destino:</strong> {$factura['destino']}</p>";
-                        echo "<p><strong>Fecha:</strong> {$factura['fecha_factura']}</p>";
-                        echo "<p><strong>Importe:</strong> {$factura['importe_total']}</p>";
-                        echo "<p><strong>Observaciones:</strong> {$factura['observaciones']}</p>";
-                        echo "</div>";
-                    }
-                } else {
+                if ($resFacturas->num_rows > 0):
+                    while ($factura = $resFacturas->fetch_assoc()):
+                ?>
+                    <div class="card">
+                        <h3>Factura: <?php echo h($factura['numero_factura']); ?></h3>
+                        <p><strong>Destino:</strong> <?php echo h($factura['destino']); ?></p>
+                        <p><strong>Fecha:</strong> <?php echo h($factura['fecha_factura']); ?></p>
+                        <p><strong>Importe:</strong> <?php echo h(number_format((float)$factura['importe_total'], 2, ',', '.')); ?> €</p>
+                        <p><strong>Observaciones:</strong> <?php echo h($factura['observaciones']); ?></p>
+                    </div>
+                <?php
+                    endwhile;
+                else:
                     echo "<p class='sin-lineas'>La orden no tiene facturas asociadas.</p>";
-                }
+                endif;
                 ?>
             </div>
         </section>
 
+        <!-- ================================================ -->
+        <!-- ENVÍOS                                            -->
+        <!-- ================================================ -->
         <section class="panel-seccion">
             <h2>Envíos relacionados</h2>
-
             <div class="cards">
                 <?php
-                $sqlEnvios = "
-                    SELECT transportista, tracking, estado_envio, fecha_envio, fecha_entrega
-                    FROM envios
-                    WHERE orden_id = $orden_id
-                    ORDER BY id DESC
-                ";
+                $stmtE = $conexion->prepare("
+                    SELECT e.id, e.transportista, e.tipo_servicio, e.tracking,
+                           e.estado_envio, e.fecha_envio, e.fecha_entrega, e.url_dachser
+                    FROM envio_ordenes eo
+                    JOIN envios e ON eo.envio_id = e.id
+                    WHERE eo.orden_id = ?
+                    ORDER BY e.id DESC
+                ");
+                $stmtE->bind_param("i", $orden_id);
+                $stmtE->execute();
+                $resEnvios = $stmtE->get_result();
 
-                $resultadoEnvios = $conexion->query($sqlEnvios);
-
-                if ($resultadoEnvios->num_rows > 0) {
-                    while ($envio = $resultadoEnvios->fetch_assoc()) {
-                        echo "<div class='card'>";
-                        echo "<h3>{$envio['transportista']}</h3>";
-                        echo "<p><strong>Tracking:</strong> {$envio['tracking']}</p>";
-                        echo "<p><strong>Estado:</strong> {$envio['estado_envio']}</p>";
-                        echo "<p><strong>Fecha envío:</strong> {$envio['fecha_envio']}</p>";
-                        echo "<p><strong>Fecha entrega:</strong> {$envio['fecha_entrega']}</p>";
-                        echo "</div>";
-                    }
-                } else {
+                if ($resEnvios->num_rows > 0):
+                    while ($envio = $resEnvios->fetch_assoc()):
+                ?>
+                    <div class="card">
+                        <h3><?php echo h($envio['transportista']); ?></h3>
+                        <p><strong>Servicio:</strong> <?php echo h($envio['tipo_servicio']); ?></p>
+                        <p><strong>Nº envío:</strong> <?php echo h($envio['tracking']) ?: '—'; ?></p>
+                        <p><strong>Estado:</strong> <?php echo h($envio['estado_envio']); ?></p>
+                        <p><strong>Fecha envío:</strong> <?php echo h($envio['fecha_envio']) ?: '—'; ?></p>
+                        <p><strong>Fecha entrega:</strong> <?php echo h($envio['fecha_entrega']) ?: '—'; ?></p>
+                        <?php if (!empty($envio['url_dachser'])): ?>
+                            <p><strong>Seguimiento:</strong>
+                                <a href="<?php echo h($envio['url_dachser']); ?>" target="_blank" rel="noopener noreferrer">
+                                    Ver en Dachser →
+                                </a>
+                            </p>
+                        <?php endif; ?>
+                    </div>
+                <?php
+                    endwhile;
+                else:
                     echo "<p class='sin-lineas'>La orden no tiene envíos asociados.</p>";
-                }
+                endif;
                 ?>
             </div>
         </section>
@@ -278,4 +321,3 @@ $orden = $resultadoOrden->fetch_assoc();
 
 </body>
 </html>
-

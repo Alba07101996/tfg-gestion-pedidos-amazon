@@ -1,4 +1,5 @@
 <?php
+require_once 'auth.php';
 $conexion = new mysqli("localhost", "root", "", "tfg_pedidos_amazon");
 
 if ($conexion->connect_error) {

@@ -1,4 +1,5 @@
 <?php
+require_once 'auth.php';
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 try {
@@ -132,7 +133,7 @@ $envios = $conexion->query("SELECT * FROM envios ORDER BY id DESC");
     <aside class="sidebar">
         <h2>Logística Amazon</h2>
         <nav>
-            <a href="index.html">Inicio</a>
+            <a href="index.php">Inicio</a>
             <a href="ordenes.php">Órdenes</a>
             <a href="nueva_orden.php">Nueva orden</a>
             <a href="buscar.php">Buscar orden</a>
@@ -307,3 +308,5 @@ $envios = $conexion->query("SELECT * FROM envios ORDER BY id DESC");
 
 </body>
 </html>
+
+

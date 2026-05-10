@@ -94,3 +94,49 @@ ALTER TABLE asns
 DROP COLUMN codigo_vendedor,
 DROP COLUMN destino,
 DROP COLUMN grupo_destino;
+
+ALTER TABLE factura_ordenes
+ADD UNIQUE (orden_id);
+
+ALTER TABLE envios
+    ADD COLUMN tipo_servicio VARCHAR(50),
+    ADD COLUMN url_dachser VARCHAR(500);
+
+    CREATE TABLE envio_ordenes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    envio_id INT NOT NULL,
+    orden_id INT NOT NULL,
+    FOREIGN KEY (envio_id) REFERENCES envios(id),
+    FOREIGN KEY (orden_id) REFERENCES ordenes(id),
+    UNIQUE (orden_id)  -- una orden solo puede estar en un envío
+);
+
+ALTER TABLE envios DROP FOREIGN KEY envios_ibfk_1;
+ALTER TABLE envios DROP COLUMN orden_id;
+
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    usuario VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+INSERT INTO usuarios (nombre, usuario, password) 
+VALUES ('Administrador', 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
+
+
+UPDATE usuarios 
+SET password = '$2y$10$8K1p/a0dR7Q5Zq3mVnJxOeW5vL9uX2yN6tF4hG7iA3bC1dE0fH2sI'
+WHERE usuario = 'admin';
+
+
+UPDATE usuarios SET password = 'admin123' WHERE usuario = 'admin';
+
+
+SELECT id, nombre, usuario, password FROM usuarios;
+
+
+UPDATE usuarios SET password = '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi' WHERE usuario = 'admin';
+
+
+UPDATE usuarios SET password = '$2y$10$tkbBdZuZF/.bmxMDDLjb/.GcxBLegFaSelscWIXjPZdZzWk/6KQy6' WHERE usuario = 'admin';
