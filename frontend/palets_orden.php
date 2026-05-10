@@ -88,7 +88,7 @@ $palets = $conexion->query("
     <aside class="sidebar">
         <h2>Logística Amazon</h2>
         <nav>
-            <a href="index.html">Inicio</a>
+            <a href="index.php">Inicio</a>
             <a href="ordenes.php" class="activo">Órdenes</a>
         </nav>
     </aside>

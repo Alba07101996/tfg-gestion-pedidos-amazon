@@ -20,7 +20,7 @@ if ($conexion->connect_error) {
     <aside class="sidebar">
         <h2>Logística Amazon</h2>
         <nav>
-            <a href="index.html">Inicio</a>
+            <a href="index.php">Inicio</a>
             <a href="ordenes.php" class="activo">Órdenes</a>
             <a href="nueva_orden.php">Nueva orden</a>
             <a href="buscar.php">Buscar orden</a>

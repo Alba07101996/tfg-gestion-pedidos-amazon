@@ -143,7 +143,7 @@ $facturas = $conexion->query("SELECT * FROM facturas ORDER BY id DESC");
     <aside class="sidebar">
         <h2>Logística Amazon</h2>
         <nav>
-            <a href="index.html">Inicio</a>
+            <a href="index.php">Inicio</a>
             <a href="ordenes.php">Órdenes</a>
             <a href="nueva_orden.php">Nueva orden</a>
             <a href="buscar.php">Buscar orden</a>
