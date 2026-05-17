@@ -18,7 +18,8 @@ if (isset($_GET["q"])) {
         LEFT JOIN factura_ordenes fo ON o.id = fo.orden_id
         LEFT JOIN facturas f ON fo.factura_id = f.id
 
-        LEFT JOIN envios e ON o.id = e.orden_id
+  LEFT JOIN envio_ordenes eo ON o.id = eo.orden_id
+LEFT JOIN envios e ON eo.envio_id = e.id
 
         WHERE 
             o.numero_orden LIKE '%$busqueda%'
